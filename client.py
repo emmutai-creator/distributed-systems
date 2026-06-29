@@ -1,16 +1,15 @@
-import socket
+import grpc
+import hello_pb2
+import hello_pb2_grpc
 
-HOST = '127.0.0.1'
-PORT = 65432
+with grpc.insecure_channel(
+    'localhost:50051'
+) as channel:
 
-with socket.socket(
-        socket.AF_INET,
-        socket.SOCK_STREAM) as s:
+    stub = hello_pb2_grpc.GreeterStub(channel)
 
-    s.connect((HOST, PORT))
+    response = stub.SayHello(
+        hello_pb2.HelloRequest(name='World')
+    )
 
-    s.sendall(b'Hello, world')
-
-    data = s.recv(1024)
-
-print('Received', repr(data))
+    print(response.message)
